@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <title>UV-App MVP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>UV-App</h1>
+        <span>Real‑time UV, solskydd & profil</span>
+      </div>
+      <span id="headerStatus" class="small">Ute</span>
+    </header>
+
+    <main>
+      <!-- HEMSIDAN -->
+      <section id="page-home" class="page active">
+
+        <!-- UV / VÄDER -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">UV & Väder</div>
+            <div class="chip" id="locationChip">Ingen plats vald</div>
+          </div>
+
+          <div class="weather-main">
+            <div>
+              <div class="weather-temp" id="tempDisplay">--°</div>
+              <div class="weather-uv">UV-index: <span id="uvDisplay">--</span></div>
+            </div>
+            <div class="weather-icon" id="weatherIcon">☀️</div>
+          </div>
+
+          <div class="weather-meta" id="weatherMeta">
+            Soltid (simulerad): -- min • Väder: --
+          </div>
+
+          <div class="location-row">
+            <div class="location-label">Plats: <span id="locationLabel">Ingen</span></div>
+            <div class="btn-group">
+              <button class="btn btn-primary" id="btnMyLocation">📍 Min plats</button>
+              <button class="btn" id="btnManualLocation">✏️ Ange plats</button>
+            </div>
+          </div>
+
+          <div class="field-group" id="manualLocationContainer" style="display:none;">
+            <div class="field-label">Stad eller lat,long</div>
+            <input type="text" id="manualLocationInput" placeholder="Ex: Malmö eller 55.6,13.0" />
+            <button class="btn btn-primary" id="btnApplyManualLocation" style="margin-top:6px;">Uppdatera plats</button>
+          </div>
+        </div>
+
+        <!-- SOLSKYDD -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Solskydd</div>
+            <div class="chip">SPF & timer</div>
+          </div>
+
+          <div class="field-label">Välj SPF‑nivå</div>
+          <div class="btn-group">
+            <button class="btn btn-spf" data-spf="15">SPF 15</button>
+            <button class="btn btn-spf" data-spf="30">SPF 30</button>
+            <button class="btn btn-spf" data-spf="50">SPF 50+</button>
+          </div>
+
+          <button class="btn danger" id="btnWaterEvent" style="margin-top:12px;">🚿 Jag har badat/duschat</button>
+
+          <div id="waterWarning" class="warning">Solskyddet kan ha sköljts bort – applicera igen.</div>
+
+          <div class="timer-display" id="timerDisplay">Ingen aktiv timer. Välj SPF för att starta.</div>
+          <div class="timer-bar"><div class="timer-bar-inner" id="timerBarInner"></div></div>
+
+          <div id="riskWarning" class="warning"></div>
+        </div>
+
+        <!-- UTE / INNE -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Ute / Inne</div>
+            <div class="chip">State för risklogik</div>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-label">Status: <span id="statusLabel">Ute</span></div>
+            <div class="toggle" id="toggleOutdoor">
+              <div class="toggle-thumb"></div>
+              <div class="toggle-text" id="toggleText">Ute</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROFIL -->
+      <section id="page-profile" class="page">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Profil</div>
+            <div class="chip">Hudtyp & känslighet</div>
+          </div>
+
+          <div class="profile-row">
+            <div class="field-group">
+              <div class="field-label">Ålder</div>
+              <input type="number" id="profileAge" placeholder="Ex: 32" min="0" />
+            </div>
+
+            <div class="field-group">
+              <div class="field-label">Hudtyp (Fitzpatrick)</div>
+              <select id="profileSkinType">
+                <option value="">Välj...</option>
+                <option value="I">I – Mycket ljus</option>
+                <option value="II">II – Ljus</option>
+                <option value="III">III – Medium</option>
+                <option value="IV">IV – Mörkare</option>
+                <option value="V">V – Mörk</option>
+                <option value="VI">VI – Mycket mörk</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Mediciner</div>
+            <select id="profileMedications"></select>
+          </div>
+
+          <div class="field-group">
+            <div class="field-label">Hudsjukdomar</div>
+            <select id="profileConditions"></select>
+          </div>
+
+          <div class="profile-actions">
+            <button class="btn btn-primary" id="btnSaveProfile">💾 Spara profil</button>
+            <button class="btn danger" id="btnClearProfile">🗑️ Rensa</button>
+          </div>
+
+          <div class="profile-meta" id="profileMeta">Profil lagras lokalt i <span>localStorage</span>.</div>
+        </div>
+
+        <!-- RISKER -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Risker</div>
+            <div class="chip">Profilbaserad riskinfo</div>
+          </div>
+
+          <div id="profileRiskBox" class="warning">Inga risker valda.</div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="tab-btn active" data-page="home"><span class="icon">🏠</span>Hem</button>
+      <button class="tab-btn" data-page="profile"><span class="icon">👤</span>Profil</button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

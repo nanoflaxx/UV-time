@@ -1,0 +1,37 @@
+{
+  "medications": {
+    "doxycycline": {
+      "name": "Doxycyklin",
+      "risk": 0.5,
+      "description": "Kan orsaka ljuskänslighet och ökad risk för solbränna."
+    },
+    "isotretinoin": {
+      "name": "Isotretinoin",
+      "risk": 0.6,
+      "description": "Ökar ljuskänslighet och tunnar ut huden."
+    },
+    "hydrochlorothiazide": {
+      "name": "Hydroklortiazid",
+      "risk": 0.7,
+      "description": "Kan ge fotosensitivitet och snabbare solskador."
+    }
+  },
+
+  "conditions": {
+    "eczema": {
+      "name": "Eksem",
+      "risk": 0.8,
+      "description": "Kan göra huden mer känslig för UV‑strålning."
+    },
+    "rosacea": {
+      "name": "Rosacea",
+      "risk": 0.7,
+      "description": "Kan triggas av sol och öka hudens reaktivitet."
+    },
+    "psoriasis": {
+      "name": "Psoriasis",
+      "risk": 0.85,
+      "description": "Kan påverka hudens UV‑tolerans."
+    }
+  }
+}
