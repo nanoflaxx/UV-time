@@ -1,6 +1,9 @@
-// === LOAD CONFIG ===
-let CONFIG = {};
+// ======================================================
+// UV-APP – APP.JS (FULL VERSION MED RISK-SERVICE)
+// ======================================================
 
+// GLOBAL CONFIG (från config.json)
+let CONFIG = {};
 fetch("config.json")
   .then(res => res.json())
   .then(data => {
@@ -8,7 +11,9 @@ fetch("config.json")
     populateDropdowns();
   });
 
-// === POPULATE DROPDOWNS ===
+// ======================================================
+// DROPDOWNS FÖR MEDICINER & HUDSJUKDOMAR
+// ======================================================
 function populateDropdowns() {
   const medSel = document.getElementById("profileMedications");
   const condSel = document.getElementById("profileConditions");
@@ -25,7 +30,9 @@ function populateDropdowns() {
   });
 }
 
-// === STORAGE KEYS ===
+// ======================================================
+// STORAGE KEYS
+// ======================================================
 const STORAGE_KEYS = {
   location: "uvapp_location",
   profile: "uvapp_profile",
@@ -33,13 +40,18 @@ const STORAGE_KEYS = {
   spfTimer: "uvapp_spf_timer",
 };
 
-// === GLOBAL STATE ===
+// ======================================================
+// GLOBAL STATE
+// ======================================================
 let currentLocation = null;
 let outdoor = true;
 let spfTimer = null;
 let timerInterval = null;
+let currentRiskMultiplier = 1;
 
-// === PAGE NAVIGATION ===
+// ======================================================
+// PAGE NAVIGATION
+// ======================================================
 const pages = {
   home: document.getElementById("page-home"),
   profile: document.getElementById("page-profile"),
@@ -56,7 +68,9 @@ tabButtons.forEach(btn => {
   });
 });
 
-// === LOCATION ===
+// ======================================================
+// LOCATION HANDLING
+// ======================================================
 function saveLocationToStorage() {
   if (!currentLocation) return;
   localStorage.setItem(STORAGE_KEYS.location, JSON.stringify(currentLocation));
@@ -135,7 +149,9 @@ document.getElementById("btnApplyManualLocation").addEventListener("click", asyn
   loadWeather();
 });
 
-// === WEATHER ===
+// ======================================================
+// WEATHER + UV
+// ======================================================
 async function loadWeather() {
   if (!currentLocation) return;
 
@@ -153,7 +169,8 @@ async function loadWeather() {
   document.getElementById("uvDisplay").textContent = uv.toFixed(1);
 
   const sunTime = simulateSunTime(uv);
-  document.getElementById("weatherMeta").textContent = `Soltid (simulerad): ${sunTime} min • Väder: ${mapWeatherCodeToText(weatherCode)}`;
+  document.getElementById("weatherMeta").textContent =
+    `Soltid (simulerad): ${sunTime} min • Väder: ${mapWeatherCodeToText(weatherCode)}`;
 }
 
 function mapWeatherCodeToEmoji(code) {
@@ -180,17 +197,11 @@ function mapWeatherCodeToText(code) {
   return "växlande";
 }
 
-// === RISK MULTIPLIER ===
+// ======================================================
+// RISK MULTIPLIER (från risk-service.js)
+// ======================================================
 function getRiskMultiplier() {
-  let multiplier = 1;
-
-  const med = document.getElementById("profileMedications").value;
-  const cond = document.getElementById("profileConditions").value;
-
-  if (CONFIG.medications[med]) multiplier *= CONFIG.medications[med].risk;
-  if (CONFIG.conditions[cond]) multiplier *= CONFIG.conditions[cond].risk;
-
-  return multiplier;
+  return currentRiskMultiplier || 1;
 }
 
 function simulateSunTime(uv) {
@@ -198,7 +209,9 @@ function simulateSunTime(uv) {
   return Math.round(base * getRiskMultiplier());
 }
 
-// === SPF TIMER ===
+// ======================================================
+// SPF TIMER
+// ======================================================
 const spfButtons = document.querySelectorAll(".btn-spf");
 const timerDisplay = document.getElementById("timerDisplay");
 const timerBarInner = document.getElementById("timerBarInner");
@@ -246,3 +259,173 @@ function updateTimerUI() {
   }
 
   const minutes = Math.round(remaining / 60000);
+  timerDisplay.textContent = `Nästa applicering om ca ${minutes} min`;
+
+  const progress = (elapsed / spfTimer.duration) * 100;
+  timerBarInner.style.width = `${progress}%`;
+}
+
+// ======================================================
+// BAD/DUSCH
+// ======================================================
+document.getElementById("btnWaterEvent").addEventListener("click", () => {
+  spfTimer = null;
+  localStorage.removeItem(STORAGE_KEYS.spfTimer);
+
+  timerDisplay.textContent = "Du har badat/duschat – applicera solskydd igen!";
+  timerBarInner.style.width = "0%";
+
+  const warn = document.getElementById("waterWarning");
+  warn.style.display = "block";
+
+  const btn = document.getElementById("btnWaterEvent");
+  btn.disabled = true;
+  btn.textContent = "🚿 Badat/duschat (vänta 10 min)";
+
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.textContent = "🚿 Jag har badat/duschat";
+    warn.style.display = "none";
+  }, 600000);
+});
+
+// ======================================================
+// UTE / INNE
+// ======================================================
+const toggleOutdoor = document.getElementById("toggleOutdoor");
+const statusLabel = document.getElementById("statusLabel");
+const toggleText = document.getElementById("toggleText");
+const headerStatus = document.getElementById("headerStatus");
+
+toggleOutdoor.addEventListener("click", () => {
+  outdoor = !outdoor;
+  localStorage.setItem(STORAGE_KEYS.outdoor, outdoor ? "1" : "0");
+  updateOutdoorUI();
+});
+
+function updateOutdoorUI() {
+  toggleOutdoor.classList.toggle("on", outdoor);
+  statusLabel.textContent = outdoor ? "Ute" : "Inne";
+  toggleText.textContent = outdoor ? "Ute" : "Inne";
+  headerStatus.textContent = outdoor ? "Ute" : "Inne";
+}
+
+// ======================================================
+// PROFIL
+// ======================================================
+const profileAge = document.getElementById("profileAge");
+const profileSkinType = document.getElementById("profileSkinType");
+const profileMedications = document.getElementById("profileMedications");
+const profileConditions = document.getElementById("profileConditions");
+
+document.getElementById("btnSaveProfile").addEventListener("click", saveProfile);
+document.getElementById("btnClearProfile").addEventListener("click", clearProfile);
+
+function saveProfile() {
+  const profile = {
+    age: profileAge.value || null,
+    skinType: profileSkinType.value || null,
+    medications: profileMedications.value || null,
+    conditions: profileConditions.value || null,
+  };
+
+  localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
+  document.getElementById("profileMeta").textContent = "Profil sparad.";
+
+  loadRiskData();
+}
+
+function loadProfile() {
+  const raw = localStorage.getItem(STORAGE_KEYS.profile);
+  if (!raw) return;
+
+  const profile = JSON.parse(raw);
+
+  profileAge.value = profile.age || "";
+  profileSkinType.value = profile.skinType || "";
+  profileMedications.value = profile.medications || "";
+  profileConditions.value = profile.conditions || "";
+}
+
+function clearProfile() {
+  localStorage.removeItem(STORAGE_KEYS.profile);
+
+  profileAge.value = "";
+  profileSkinType.value = "";
+  profileMedications.value = "";
+  profileConditions.value = "";
+
+  document.getElementById("profileMeta").textContent = "Profil rensad.";
+  document.getElementById("riskWarning").style.display = "none";
+  updateProfileRiskBox([]);
+  loadWeather();
+}
+
+// ======================================================
+// RISKDATA (OpenFDA + DermNet + config.json)
+// ======================================================
+async function loadRiskData() {
+  const med = profileMedications.value;
+  const cond = profileConditions.value;
+
+  const risk = await RiskService.getCombinedRisk(med, cond);
+
+  currentRiskMultiplier = risk.multiplier;
+
+  const riskWarning = document.getElementById("riskWarning");
+
+  if (risk.warnings.length) {
+    riskWarning.style.display = "block";
+    riskWarning.innerHTML = `
+      <strong>⚠ Viktigt:</strong><br>
+      ${risk.warnings.join("<br><br>")}<br><br>
+      <em>Dessa rekommendationer är endast uppskattningar baserade på öppna datakällor. Jag är inte läkare och detta ersätter inte medicinsk rådgivning.</em>
+    `;
+  } else {
+    riskWarning.style.display = "none";
+  }
+
+  updateProfileRiskBox(risk.warnings);
+  loadWeather();
+}
+
+function updateProfileRiskBox(warnings) {
+  const box = document.getElementById("profileRiskBox");
+
+  const med = profileMedications.value;
+  const cond = profileConditions.value;
+
+  let text = "";
+
+  if (med) text += `<strong>Mediciner:</strong> ${CONFIG.medications[med].name}<br>`;
+  if (cond) text += `<strong>Hudsjukdom:</strong> ${CONFIG.conditions[cond].name}<br>`;
+
+  if (warnings.length) {
+    text += `<br><strong>Risker:</strong><br>${warnings.join("<br>")}`;
+  }
+
+  if (!med && !cond && !warnings.length) {
+    text = "Inga risker valda.";
+  }
+
+  box.innerHTML = text;
+}
+
+// ======================================================
+// INIT
+// ======================================================
+async function init() {
+  loadProfile();
+  loadLocationFromStorage();
+  loadOutdoorFromStorage();
+  loadRiskData();
+  loadWeather();
+}
+
+function loadOutdoorFromStorage() {
+  const raw = localStorage.getItem(STORAGE_KEYS.outdoor);
+  outdoor = raw === "1";
+  updateOutdoorUI();
+}
+
+document.addEventListener("DOMContentLoaded", init);
