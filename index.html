@@ -180,9 +180,13 @@
 
   </div>
 
-  <!-- JS MODULES -->
-  <script src="risk-service.js"></script>
-  <script src="app.js"></script>
+<!-- Ladda config.json innan JS -->
+<script id="configData" type="application/json" src="config.json"></script>
 
+<!-- Riskmotor (OpenFDA + DermNet + config.json) -->
+<script src="risk-service.js"></script>
+
+<!-- Huvudlogik -->
+<script src="app.js"></script>
 </body>
 </html>
