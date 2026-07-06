@@ -4,11 +4,15 @@
   <meta charset="UTF-8" />
   <title>UV-App MVP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <div class="app">
+
+    <!-- HEADER -->
     <header>
       <div>
         <h1>UV-App</h1>
@@ -17,11 +21,15 @@
       <span id="headerStatus" class="small">Ute</span>
     </header>
 
+    <!-- MAIN -->
     <main>
+
+      <!-- ========================= -->
       <!-- HEMSIDAN -->
+      <!-- ========================= -->
       <section id="page-home" class="page active">
 
-        <!-- UV / VÄDER -->
+        <!-- UV & VÄDER -->
         <div class="card">
           <div class="card-header">
             <div class="card-title">UV & Väder</div>
@@ -69,14 +77,18 @@
             <button class="btn btn-spf" data-spf="50">SPF 50+</button>
           </div>
 
-          <button class="btn danger" id="btnWaterEvent" style="margin-top:12px;">🚿 Jag har badat/duschat</button>
+          <button class="btn danger" id="btnWaterEvent" style="margin-top:12px;">
+            🚿 Jag har badat/duschat
+          </button>
 
-          <div id="waterWarning" class="warning">Solskyddet kan ha sköljts bort – applicera igen.</div>
+          <div id="waterWarning" class="warning" style="display:none;">
+            Solskyddet kan ha sköljts bort – applicera igen.
+          </div>
 
           <div class="timer-display" id="timerDisplay">Ingen aktiv timer. Välj SPF för att starta.</div>
           <div class="timer-bar"><div class="timer-bar-inner" id="timerBarInner"></div></div>
 
-          <div id="riskWarning" class="warning"></div>
+          <div id="riskWarning" class="warning" style="display:none;"></div>
         </div>
 
         <!-- UTE / INNE -->
@@ -94,10 +106,14 @@
             </div>
           </div>
         </div>
+
       </section>
 
+      <!-- ========================= -->
       <!-- PROFIL -->
+      <!-- ========================= -->
       <section id="page-profile" class="page">
+
         <div class="card">
           <div class="card-header">
             <div class="card-title">Profil</div>
@@ -151,15 +167,22 @@
 
           <div id="profileRiskBox" class="warning">Inga risker valda.</div>
         </div>
+
       </section>
+
     </main>
 
+    <!-- BOTTOM NAV -->
     <nav class="bottom-nav">
       <button class="tab-btn active" data-page="home"><span class="icon">🏠</span>Hem</button>
       <button class="tab-btn" data-page="profile"><span class="icon">👤</span>Profil</button>
     </nav>
+
   </div>
+
+  <!-- JS MODULES -->
   <script src="risk-service.js"></script>
   <script src="app.js"></script>
+
 </body>
 </html>
