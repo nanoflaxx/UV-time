@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <title>UV-App MVP</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -21,15 +19,11 @@
       <span id="headerStatus" class="small">Ute</span>
     </header>
 
-    <!-- MAIN -->
     <main>
 
-      <!-- ========================= -->
       <!-- HEMSIDAN -->
-      <!-- ========================= -->
       <section id="page-home" class="page active">
 
-        <!-- UV & VÄDER -->
         <div class="card">
           <div class="card-header">
             <div class="card-title">UV & Väder</div>
@@ -109,9 +103,7 @@
 
       </section>
 
-      <!-- ========================= -->
       <!-- PROFIL -->
-      <!-- ========================= -->
       <section id="page-profile" class="page">
 
         <div class="card">
@@ -180,18 +172,28 @@
 
   </div>
 
-  <!-- ========================= -->
   <!-- SCRIPTLOADING (rätt ordning!) -->
-  <!-- ========================= -->
 
-  <!-- 1. Ladda config.json innan JS -->
-  <script id="configData" type="application/json" src="config.json"></script>
+  <!-- 1. Ladda config.json först -->
+  <script>
+    window.CONFIG = null;
 
-  <!-- 2. Riskmotor (OpenFDA + DermNet + config.json) -->
-  <script src="risk-service.js"></script>
+    fetch("config.json")
+      .then(res => res.json())
+      .then(data => {
+        window.CONFIG = data;
 
-  <!-- 3. Huvudlogik -->
-  <script src="app.js"></script>
+        const riskScript = document.createElement("script");
+        riskScript.src = "risk-service.js";
+        document.body.appendChild(riskScript);
+
+        riskScript.onload = () => {
+          const appScript = document.createElement("script");
+          appScript.src = "app.js";
+          document.body.appendChild(appScript);
+        };
+      });
+  </script>
 
 </body>
 </html>
