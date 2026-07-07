@@ -7,12 +7,8 @@
 // ✔ config.json (fallback + multipliers)
 // ===============================
 
-let CONFIG = {};
-
-// Ladda config.json
-fetch("config.json")
-  .then(res => res.json())
-  .then(data => CONFIG = data);
+// ❗ FIX: Använd CONFIG från app.js istället för egen fetch
+let CONFIG = window.CONFIG || { medications: {}, conditions: {} };
 
 // ===============================
 // 1. Hämta medicinrisk från OpenFDA
@@ -37,7 +33,7 @@ async function fetchMedicationRisk(medKey) {
       text.includes("sunburn") ||
       text.includes("uv sensitivity")
     ) {
-      apiRisk = 0.5; // API-baserad risk
+      apiRisk = 0.5;
       apiDescription = "OpenFDA: Medicinen är kopplad till ljuskänslighet.";
     }
   } catch (e) {
@@ -104,20 +100,16 @@ async function getCombinedRisk(medKey, condKey) {
   let warnings = [];
   let multiplier = 1;
 
-  // Medicinrisk
   if (medRisk) {
     multiplier *= medRisk.apiRisk || medRisk.configRisk;
-
     warnings.push(
       `<strong>${medRisk.name}</strong>: ${medRisk.description}` +
       (medRisk.apiDescription ? `<br>${medRisk.apiDescription}` : "")
     );
   }
 
-  // Hudsjukdomsrisk
   if (condRisk) {
     multiplier *= condRisk.apiRisk || condRisk.configRisk;
-
     warnings.push(
       `<strong>${condRisk.name}</strong>: ${condRisk.description}` +
       (condRisk.apiDescription ? `<br>${condRisk.apiDescription}` : "")
