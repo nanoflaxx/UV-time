@@ -175,25 +175,22 @@
   <!-- SCRIPTLOADING (rätt ordning!) -->
 
   <!-- 1. Ladda config.json först -->
-  <script>
-    window.CONFIG = null;
+<script>
+  fetch("./config.json")
+    .then(res => res.json())
+    .then(cfg => {
+      window.CONFIG = cfg;
 
-    fetch("config.json")
-      .then(res => res.json())
-      .then(data => {
-        window.CONFIG = data;
+      const risk = document.createElement("script");
+      risk.src = "risk-service.js";
+      document.body.appendChild(risk);
 
-        const riskScript = document.createElement("script");
-        riskScript.src = "risk-service.js";
-        document.body.appendChild(riskScript);
-
-        riskScript.onload = () => {
-          const appScript = document.createElement("script");
-          appScript.src = "app.js";
-          document.body.appendChild(appScript);
-        };
-      });
-  </script>
-
+      risk.onload = () => {
+        const app = document.createElement("script");
+        app.src = "app.js";
+        document.body.appendChild(app);
+      };
+    });
+</script>
 </body>
 </html>
