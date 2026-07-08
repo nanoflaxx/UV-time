@@ -7,8 +7,8 @@
 // ✔ config.json (fallback + multipliers)
 // ===============================
 
-// ❗ FIX: Använd CONFIG från app.js istället för egen fetch
-let CONFIG = window.CONFIG || { medications: {}, conditions: {} };
+// ❗ FIX: Använd CONFIG från app.js, deklarera inte igen
+const CONFIG = window.CONFIG;
 
 // ===============================
 // 1. Hämta medicinrisk från OpenFDA
@@ -16,7 +16,7 @@ let CONFIG = window.CONFIG || { medications: {}, conditions: {} };
 async function fetchMedicationRisk(medKey) {
   if (!medKey) return null;
 
-  const medConfig = CONFIG.medications[medKey];
+  const medConfig = CONFIG?.medications?.[medKey];
   let apiRisk = null;
   let apiDescription = null;
 
@@ -24,7 +24,6 @@ async function fetchMedicationRisk(medKey) {
     const url = `https://api.fda.gov/drug/label.json?search=${medKey}`;
     const res = await fetch(url);
     const data = await res.json();
-
     const text = JSON.stringify(data.results?.[0] || "").toLowerCase();
 
     if (
@@ -55,7 +54,7 @@ async function fetchMedicationRisk(medKey) {
 async function fetchConditionRisk(condKey) {
   if (!condKey) return null;
 
-  const condConfig = CONFIG.conditions[condKey];
+  const condConfig = CONFIG?.conditions?.[condKey];
   let apiRisk = null;
   let apiDescription = null;
 
@@ -116,15 +115,10 @@ async function getCombinedRisk(medKey, condKey) {
     );
   }
 
-  return {
-    multiplier,
-    warnings
-  };
+  return { multiplier, warnings };
 }
 
 // ===============================
 // 4. Exportera funktioner
 // ===============================
-window.RiskService = {
-  getCombinedRisk
-};
+window.RiskService = { getCombinedRisk };
