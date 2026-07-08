@@ -4,7 +4,7 @@
 
 // GLOBAL CONFIG (från config.json)
 let CONFIG = {};
-fetch("config.json")
+fetch("./config.json")
   .then(res => res.json())
   .then(data => {
     CONFIG = data;
